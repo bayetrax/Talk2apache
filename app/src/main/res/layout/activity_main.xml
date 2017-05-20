@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.intel.voice.talk2apache.MainActivity"
+    tools:layout_editor_absoluteY="73dp"
+    tools:layout_editor_absoluteX="0dp">
+<ScrollView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteY="5dp"
+        tools:layout_editor_absoluteX="112dp">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Enable"
+                android:id="@+id/btn_cancel"
+                android:nestedScrollingEnabled="false"
+                android:onClick="enableWakeOnVoice"
+                android:layout_alignParentTop="true" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Disable"
+                android:id="@+id/btn_disable"
+                android:nestedScrollingEnabled="false"
+                android:onClick="disableWakeOnVoice"
+                android:layout_alignBottom="@+id/btn_cancel"
+                android:layout_toEndOf="@+id/btn_cancel" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="State: "
+                android:id="@+id/textView_state"
+                android:layout_below="@+id/btn_cancel"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Text"
+                android:id="@+id/textView_stateresult"
+                android:layout_alignTop="@+id/textView_state"
+                android:layout_toEndOf="@+id/textView_state" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ARM"
+                android:id="@+id/btn_start"
+                android:onClick="armWakeOnVoice"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@+id/btn_disable" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="getState"
+                android:id="@+id/btn_check"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@+id/btn_start"
+                android:onClick="getState" />
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Auto Rearm"
+                android:id="@+id/checkBox_auto_rearm"
+                android:checked="false"
+                android:layout_below="@+id/btn_start"
+                android:layout_toEndOf="@+id/btn_start" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Start"
+                android:id="@+id/btn_start"
+                android:onClick="startVoice"
+                android:layout_below="@+id/editText"
+                android:layout_alignParentStart="true" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Check"
+                android:id="@+id/btn_check"
+                android:onClick="checkService"
+                android:layout_alignTop="@+id/btn_cancel"
+                android:layout_toEndOf="@+id/btn_cancel" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stop"
+                android:id="@+id/btn_stop"
+                android:onClick="stopVoice"
+                android:layout_alignTop="@+id/btn_start"
+                android:layout_toEndOf="@+id/btn_start" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancel"
+                android:id="@+id/btn_cancel"
+                android:onClick="cancelVoice"
+                android:layout_alignTop="@+id/btn_stop"
+                android:layout_toEndOf="@+id/btn_stop" />
+
+            <RadioGroup
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/radiogroup_mode"
+                android:orientation="horizontal"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignEnd="@+id/radiogroup_resource">
+
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Command"
+                    android:id="@+id/radioButton"
+                    android:checked="false" />
+
+                <RadioButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Speech"
+                    android:id="@+id/radioButton2"
+                    android:checked="true"
+                    android:layout_above="@+id/btn_start"
+                    android:layout_alignEnd="@+id/textView_state" />
+
+            </RadioGroup>
+
+            <RadioGroup
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/radiogroup_resource"
+                android:orientation="horizontal"
+                android:layout_below="@+id/radiogroup_mode"
+                android:layout_alignParentStart="true">
+
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="User_Provide"
+                    android:id="@+id/radioButton3"
+                    android:checked="false"
+                    android:layout_above="@+id/btn_stop"
+                    android:layout_alignParentStart="true" />
+
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Default"
+                    android:id="@+id/radioButton4"
+                    android:checked="true"
+                    android:layout_above="@+id/btn_stop"
+                    android:layout_alignStart="@+id/radioButton2" />
+
+
+            </RadioGroup>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Volume:"
+                android:id="@+id/textView_volume"
+                android:layout_below="@+id/btn_start"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Result:"
+                android:id="@+id/textView_result"
+                android:layout_below="@+id/textView_volume"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="17dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Text"
+                android:id="@+id/textView_val2"
+                android:layout_below="@+id/textView_val1"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Text"
+                android:id="@+id/textView_val1"
+                android:layout_below="@+id/textView_result"
+                android:layout_alignParentStart="true" />
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/progressBar"
+                android:layout_below="@+id/textView_volume"
+                android:layout_alignParentStart="true"
+                android:layout_alignEnd="@+id/btn_stop" />
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PartialResult"
+                android:id="@+id/checkBox"
+                android:checked="true"
+                android:layout_above="@+id/radiogroup_resource"
+                android:layout_alignStart="@+id/textView_num_result" />
+
+            <EditText
+                android:id="@+id/editText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/checkBox"
+                android:layout_toEndOf="@+id/textView_num_result"
+                android:hint="2"
+                android:inputType="number" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No. Of Result:"
+                android:id="@+id/textView_num_result"
+                android:layout_marginStart="21dp"
+                android:layout_alignBaseline="@+id/editText"
+                android:layout_alignBottom="@+id/editText"
+                android:layout_toEndOf="@+id/radiogroup_resource" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TrailingSilence:"
+                android:id="@+id/textView_trailing_silence"
+                android:layout_above="@+id/textView_result"
+                android:layout_alignStart="@+id/btn_cancel" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText2"
+                android:layout_alignBottom="@+id/progressBar"
+                android:layout_alignEnd="@+id/btn_check"
+                android:layout_toEndOf="@+id/textView_trailing_silence"
+                android:layout_below="@+id/btn_check"
+                android:inputType="number"
+                android:textSize="@dimen/abc_text_size_body_2_material" />
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Record"
+                android:id="@+id/checkBox2"
+                android:checked="false"
+                android:layout_above="@+id/textView_val1"
+                android:layout_toEndOf="@+id/progressBar" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Language:"
+                android:id="@+id/textView_language"
+                android:layout_below="@+id/checkBox2"
+                android:layout_alignStart="@+id/checkBox2" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText3"
+                android:layout_below="@+id/checkBox2"
+                android:layout_alignBottom="@+id/textView_val2"
+                android:layout_alignEnd="@+id/editText2"
+                android:layout_toEndOf="@+id/textView_language" />
+
+        </RelativeLayout>
+    </LinearLayout>
+
+</ScrollView>
+
+
+</android.support.constraint.ConstraintLayout>

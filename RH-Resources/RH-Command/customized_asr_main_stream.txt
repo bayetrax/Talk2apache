@@ -1,0 +1,46 @@
+-dec:type wfstotf
+-dec:wfst:acousticScaleFactor 0.12
+-dec:wfst:acousticModelFName en-US/rh.dnn
+-dec:wfst:hmmModelFName en-US/rh.hmm
+-dec:wfst:beamWidth 10.5
+-dec:wfst:tokenBufferSize 150000
+-dec:wfst:outSymsFName en-US/words.txt
+-dec:wfst:fsmFName en-US/cl.fst
+-dec:wfst:latticeWidth 5
+-dec:wfstotf:gramFsmFName en-US/g.fst
+-dec:wfstotf:minStableFrames 45
+-dec:wfstotf:traceBackLogSize 17
+-dec:wfstotf:cacheLogSize 17
+-dec:wfst:nbest 1
+
+-fe:type rt
+-fe:rt:vad false
+-fe:rt:vad:adapt true
+-fe:rt:vad:adapt_rate 1.0
+-fe:rt:vad:trailing_silence_ms 100
+-fe:rt:vad:leading_silence_ms 200
+-fe:rt:vad:onset_speech_ms 100
+-fe:rt:vad:onset_silence_ms 300
+-fe:rt:vad:noise_min_db 16
+-fe:rt:vad:noise_max_db 70
+-fe:rt:vad:noise_def_db 19
+-fe:rt:vad:threshold_silence 10
+-fe:rt:vad:threshold_speech 20
+-fe:source:type stream
+-eng:emitPartialResults yes
+-eng:output:emitEmptyResults no
+-eng:output:format xml
+-eng:logLevel 0
+
+-dec:wfst:triphonesFName en-US/rh.tri
+-dec:wfst:dynFstFName 3:en-US/cl_dynamic.fst
+-dec:wfst:dynSymsFName 3:en-US/cl_dynamic.txt
+
+-dlex:useNSN true
+-dlex:allXWordContexts false
+-dlex:phraseStartupPenalty 3.0
+-dlex:wordStartupPenalty 2.0
+-dlex:phraseStartSymbol <eps>
+-dlex:phraseEndSymbol <eps>
+
+-g2p:fst en-US/g2p.fst
