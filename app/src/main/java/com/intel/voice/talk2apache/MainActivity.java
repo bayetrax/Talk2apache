@@ -296,7 +296,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
             //
             recognitionIntent.putExtra(HUDRecognizerIntent.EXTRA_LANGUAGE_RESOURCE_DIR, "/data/RH");
             // make sure the name of the configuration file matches with the one in the /data/RH folder !!!
-            recognitionIntent.putExtra(HUDRecognizerIntent.EXTRA_LANUGAGE_CONFIGURATION_FILE, "/data/RH/customized_asr_main_stream.txt");
+            recognitionIntent.putExtra(HUDRecognizerIntent.EXTRA_LANUGAGE_CONFIGURATION_FILE, "/data/RH/command_asr_main_stream.txt");
         } else if ("Default".equals(btnResource.getText().toString())) {
             Log.d(TAG, "Using default resource files and configuration");
         }
