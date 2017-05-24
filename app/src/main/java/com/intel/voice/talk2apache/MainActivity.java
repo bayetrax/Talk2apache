@@ -1,26 +1,44 @@
 package com.intel.voice.talk2apache;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.speech.RecognitionListener;
 import android.speech.SpeechRecognizer;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.reconinstruments.os.HUDOS;
 import com.reconinstruments.os.speech.HUDRecognizerIntent;
@@ -63,6 +81,137 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
     private Handler mStopHandler = new Handler();
     private Runnable mTask;
+
+    private static final int START_VIDEO = 1;
+    private static final int STOP_VIDEO = 2;
+    private static final int SHOW_TIME = 3;
+    private static final int PLAY_MUSIC = 4;
+    private static final int ASK_QUESTION = 5;
+
+
+    VideoView videoView;
+    TextClock textClock;
+    LinearLayout resultLayout;
+
+    private final Handler mHandlerResult = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(Message msg) {
+            int code = getCommandCode((String) msg.obj);
+            switch (code) {
+
+                case 1:
+
+                    resultLayout.removeAllViews();
+                    videoView = new VideoView(MainActivity.this);
+                    Uri video = Uri.parse("android.resource://" + getPackageName() + "/"
+                            + R.raw.movie);
+                    videoView.setVideoURI(video);
+
+
+                    videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                        @Override
+                        public void onPrepared(MediaPlayer mediaPlayer) {
+                            videoView.start();
+                        }
+                    });
+                    videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mediaPlayer) {
+                            resultLayout.removeAllViews();
+                        }
+                    });
+
+
+                    resultLayout.addView(videoView);
+                    break;
+                case 2:
+
+                    if (videoView != null)
+                        videoView.stopPlayback();
+                    resultLayout.removeAllViews();
+                    break;
+                case 3:
+                    resultLayout.removeAllViews();
+                    textClock = new TextClock(MainActivity.this);
+                    textClock.getFormat12Hour();
+                    textClock.setTextSize(60);
+                    resultLayout.addView(textClock);
+                    break;
+
+                case 4:
+                    resultLayout.removeAllViews();
+                    videoView = new VideoView(MainActivity.this);
+                    Uri audio = Uri.parse("android.resource://" + getPackageName() + "/"
+                            + R.raw.horizons);
+                    videoView.setVideoURI(audio);
+                    videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                        @Override
+                        public void onPrepared(MediaPlayer mediaPlayer) {
+                            videoView.start();
+                        }
+                    });
+                    videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mediaPlayer) {
+                            resultLayout.removeAllViews();
+                        }
+                    });
+                    resultLayout.addView(videoView);
+                    break;
+                case 5:
+
+                    resultLayout.removeAllViews();
+                    final Activity activity = MainActivity.this;
+                    WebView webview = new WebView(activity);
+
+                    webview.getSettings().setJavaScriptEnabled(true);
+
+                    webview.setWebViewClient(new WebViewClient() {
+                        @Override
+                        public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                            Toast.makeText(activity, "Oh no! " + error.getDescription(), Toast.LENGTH_SHORT).show();
+                        }
+
+                    });
+
+//                    webview.loadUrl("https://developer.android.com/");
+                    webview.loadUrl("http://lmgtfy.com/?q=I%27m+Feeling+Curious");
+
+                    resultLayout.addView(webview);
+
+                    break;
+                case 0:
+                    resultLayout.removeAllViews();
+                    TextView textView = new TextView(MainActivity.this);
+                    textView.append("Use Any of the below Extra custom commands\n\n");
+                    textView.append("Start Video\n");
+                    textView.append("Stop Video\n");
+                    textView.append("Show Time\n");
+                    textView.append("Play Music\n");
+                    textView.append("Ask Question\n");
+                    resultLayout.addView(textView);
+                    break;
+            }
+
+
+        }
+    };
+
+    private int getCommandCode(String res) {
+
+        if (res.contains("START VIDEO")) {
+            return 1;
+        } else if (res.contains("STOP VIDEO")) {
+            return 2;
+        } else if (res.contains("SHOW TIME")) {
+            return 3;
+        } else if (res.contains("PLAY MUSIC")) {
+            return 4;
+        } else if (res.contains("ASK QUESTION")) {
+            return 5;
+        }
+        return 0;
+    }
 
     private final Handler mHandler = new Handler() {
         @Override
@@ -213,6 +362,9 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
             display.setText("WoV Disabled");
         }
         /////////////WOVE
+
+        resultLayout = (LinearLayout) findViewById(R.id.resultlayout);
+
     }
 
     @Override
@@ -311,7 +463,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         //recognitionIntent.putExtra(HUDRecognizerIntent.EXTRA_RMS_UPDATE_CYCLE_MILLIS, 100);
         String maxNumberResults = maxResult.getText().toString();
 
-        if(maxNumberResults == null || maxNumberResults.isEmpty()) {
+        if (maxNumberResults == null || maxNumberResults.isEmpty()) {
             maxResult.setText("1");
         } else {
             try {
@@ -323,7 +475,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         }
 
         String inputCompleteSilenceLength = slienceLength.getText().toString();
-        if(inputCompleteSilenceLength == null || inputCompleteSilenceLength.isEmpty()) {
+        if (inputCompleteSilenceLength == null || inputCompleteSilenceLength.isEmpty()) {
             slienceLength.setText("");
         } else {
             try {
@@ -341,7 +493,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         }
 
         Bundle intentBundle = recognitionIntent.getExtras();
-        for (String key: intentBundle.keySet()) {
+        for (String key : intentBundle.keySet()) {
             Log.i(TAG, "key: " + key + " = " + intentBundle.get(key).toString());
         }
 
@@ -393,21 +545,25 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         }
         List activities = getPackageManager().queryIntentActivities(new Intent(HUDRecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
         Log.e(TAG, "app to handle activities: " + activities.size());
+
     }
+
 
     private void showError(int error) {
         Toast.makeText(this, "Error (" + error + ")", Toast.LENGTH_SHORT).show();
     }
 
-    private void showResult (String result) {
+    private void showResult(String result) {
         resultText.setText(result);
+
+        mHandlerResult.sendMessage(mHandlerResult.obtainMessage(100, result));
     }
 
-    private void showPartialResult (String result) {
+    private void showPartialResult(String result) {
         partialResultText.setText(result);
     }
 
-    private void writeRecordedSpeech (byte[] samples) {
+    private void writeRecordedSpeech(byte[] samples) {
 
         if (!recordCheckBox.isChecked()) {
             Log.d(TAG, "Not Recording");
@@ -467,80 +623,80 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         os.write((value >> 8) & 0xff);
     }
 
-//    private RecognitionListener listener = new RecognitionListener() {
-        @Override
-        public void onReadyForSpeech(Bundle params) {
-            Log.d(TAG, "onReadyForSpeech is called ");
+    //    private RecognitionListener listener = new RecognitionListener() {
+    @Override
+    public void onReadyForSpeech(Bundle params) {
+        Log.d(TAG, "onReadyForSpeech is called ");
+    }
+
+    @Override
+    public void onBeginningOfSpeech() {
+        Log.d(TAG, "onBeginningOfSpeech called ");
+    }
+
+    @Override
+    public void onRmsChanged(float rmsdB) {
+        Message msg = mHandler.obtainMessage(VOLUME_UPDATE, rmsdB);
+        mHandler.sendMessage(msg);
+    }
+
+    @Override
+    public void onBufferReceived(byte[] buffer) {
+        writeRecordedSpeech(buffer);
+    }
+
+    @Override
+    public void onEndOfSpeech() {
+        Log.d(TAG, "onEndOfSpeech called ");
+    }
+
+    @Override
+    public void onError(int error) {
+        Log.e(TAG, "on Error is called with error: " + error);
+        showError(error);
+        startBtn.setEnabled(true);
+        stopBtn.setEnabled(false);
+    }
+
+    @Override
+    public void onResults(Bundle results) {
+        startBtn.setEnabled(true);
+        stopBtn.setEnabled(false);
+
+        if (results == null) {
+            Log.d(TAG, "got nothing");
+            return;
         }
 
-        @Override
-        public void onBeginningOfSpeech() {
-            Log.d(TAG, "onBeginningOfSpeech called ");
+        ArrayList<String> resultlist = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        float[] conflist = results.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES);
+
+        for (int i = 0; i < resultlist.size(); i++) {
+            Log.d(TAG, "results: " + resultlist.get(i));
+            Log.d(TAG, "confidence: " + conflist[i]);
+        }
+        String resultString = resultlist.get(0);
+        showResult(resultString);
+    }
+
+    @Override
+    public void onPartialResults(Bundle partialResults) {
+        ArrayList<String> resultlist = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        float[] conflist = partialResults.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES);
+
+        for (int i = 0; i < resultlist.size(); i++) {
+            Log.d(TAG, "partial results: " + resultlist.get(i));
+            Log.d(TAG, "partial results confidence: " + conflist[i]);
         }
 
-        @Override
-        public void onRmsChanged(float rmsdB) {
-            Message msg = mHandler.obtainMessage(VOLUME_UPDATE, rmsdB);
-            mHandler.sendMessage(msg);
-        }
+        String resultString = resultlist.get(0);
+        showPartialResult(resultString);
+    }
 
-        @Override
-        public void onBufferReceived(byte[] buffer) {
-            writeRecordedSpeech(buffer);
-        }
-
-        @Override
-        public void onEndOfSpeech() {
-            Log.d(TAG, "onEndOfSpeech called ");
-        }
-
-        @Override
-        public void onError(int error) {
-            Log.e(TAG, "on Error is called with error: " + error);
-            showError(error);
-            startBtn.setEnabled(true);
-            stopBtn.setEnabled(false);
-        }
-
-        @Override
-        public void onResults(Bundle results) {
-            startBtn.setEnabled(true);
-            stopBtn.setEnabled(false);
-
-            if (results == null) {
-                Log.d(TAG, "got nothing");
-                return;
-            }
-
-            ArrayList<String> resultlist = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-            float [] conflist = results.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES);
-
-            for (int i = 0; i < resultlist.size(); i++) {
-                Log.d(TAG, "results: " + resultlist.get(i));
-                Log.d(TAG, "confidence: " + conflist[i]);
-            }
-            String resultString = resultlist.get(0);
-            showResult(resultString);
-        }
-
-        @Override
-        public void onPartialResults(Bundle partialResults) {
-            ArrayList<String> resultlist = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-            float [] conflist = partialResults.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES);
-
-            for (int i = 0; i < resultlist.size(); i++) {
-                Log.d(TAG, "partial results: " + resultlist.get(i));
-                Log.d(TAG, "partial results confidence: " + conflist[i]);
-            }
-
-            String resultString = resultlist.get(0);
-            showPartialResult(resultString);
-        }
-
-        @Override
-        public void onEvent(int eventType, Bundle params) {
-            // Ignored
-        }
+    @Override
+    public void onEvent(int eventType, Bundle params) {
+        // Ignored
+    }
 //    };
 
     //WOVS
@@ -550,7 +706,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         mHandlerWOV.sendMessage(mHandler.obtainMessage(event.ordinal(), code.ordinal()));
     }
 
-    public void enableWakeOnVoice(View view){
+    public void enableWakeOnVoice(View view) {
         Log.d(TAG, "Enabling WoV");
         mHUDWakeOnVoiceManager.setWoVEnabled(true);
         // used for sanity test
@@ -573,7 +729,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         return;
     }
 
-    public void disableWakeOnVoice(View view){
+    public void disableWakeOnVoice(View view) {
         Log.d(TAG, "Disabling WoV");
         mHUDWakeOnVoiceManager.setWoVEnabled(false);
 
@@ -585,7 +741,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         return;
     }
 
-    public void armWakeOnVoice(View view){
+    public void armWakeOnVoice(View view) {
         Log.d(TAG, "re-arm WoV");
         mHUDWakeOnVoiceManager.reArmWoV();
         return;
@@ -595,7 +751,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         return autoRearm.isChecked();
     }
 
-    public void getState(View view){
+    public void getState(View view) {
         Log.d(TAG, "Get State");
         HUDWakeOnVoiceManager.WoVState state = mHUDWakeOnVoiceManager.getWoVState();
         String stateString;
